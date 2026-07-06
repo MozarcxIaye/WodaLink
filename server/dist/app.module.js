@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
+const mongoose_1 = require("@nestjs/mongoose");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -19,6 +20,26 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true
+            }),
+            mongoose_1.MongooseModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (config) => ({
+                    uri: config.get('MONGO_URI'),
+                    onConnectionCreate: (connection) => {
+                        console.log("Connecting to MongoDB...");
+                        connection.on("connected", () => {
+                            console.log("MongoDB Connected");
+                        });
+                        connection.on("error", (err) => {
+                            console.log("Mongo Error:", err.message);
+                        });
+                        connection.on("disconnected", () => {
+                            console.log("MongoDB Disconnected");
+                        });
+                        return connection;
+                    },
+                }),
             })
         ],
         controllers: [app_controller_1.AppController],
