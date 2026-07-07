@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { IdentityModule } from './identity/identity.module';
+import { ProcurementModule } from './procurement/procurement.module';
+
 
 @Module({
   imports: [
@@ -35,7 +38,13 @@ import { MongooseModule } from '@nestjs/mongoose';
           return connection;
         },
       }),
-    })
+    }),
+    
+    IdentityModule,
+    
+    ProcurementModule,
+    
+    
   ],
   controllers: [AppController],
   providers: [AppService],

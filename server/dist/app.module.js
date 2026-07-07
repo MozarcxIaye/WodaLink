@@ -12,6 +12,8 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
+const identity_module_1 = require("./identity/identity.module");
+const procurement_module_1 = require("./procurement/procurement.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,7 +42,9 @@ exports.AppModule = AppModule = __decorate([
                         return connection;
                     },
                 }),
-            })
+            }),
+            identity_module_1.IdentityModule,
+            procurement_module_1.ProcurementModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
