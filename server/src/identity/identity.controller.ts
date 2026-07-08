@@ -1,34 +1,23 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { IdentityService } from './identity.service';
-import { CreateIdentityDto } from './dto/create-identity.dto';
-import { UpdateIdentityDto } from './dto/update-identity.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('identity')
 export class IdentityController {
   constructor(private readonly identityService: IdentityService) {}
 
-  @Post()
-  create(@Body() createIdentityDto: CreateIdentityDto) {
-    return this.identityService.create(createIdentityDto);
+
+  @Post('register')
+  register(@Body() registerUserDto: RegisterUserDto){
+    return this.identityService.register(registerUserDto)
   }
 
-  @Get()
-  findAll() {
-    return this.identityService.findAll();
+  @Post('login')
+  login(@Body() loginUserDto: LoginDto){
+    return this.identityService.login(loginUserDto)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.identityService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIdentityDto: UpdateIdentityDto) {
-    return this.identityService.update(+id, updateIdentityDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.identityService.remove(+id);
-  }
+  
+ 
 }

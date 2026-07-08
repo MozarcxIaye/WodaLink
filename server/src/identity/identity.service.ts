@@ -1,26 +1,33 @@
+import { LoginDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 import { Injectable } from '@nestjs/common';
-import { CreateIdentityDto } from './dto/create-identity.dto';
-import { UpdateIdentityDto } from './dto/update-identity.dto';
+import { VerifyKycDto } from './dto/verify-kyc.dto';
 
 @Injectable()
 export class IdentityService {
-  create(createIdentityDto: CreateIdentityDto) {
-    return 'This action adds a new identity';
+  constructor(private readonly identityService: IdentityService) { }
+
+  async register(registerUserDto: RegisterUserDto) {
+
+    if (!registerUserDto.password) {
+      throw new Error('Password is required.')
+    }
+    // const hashedPassword = await bcrypt.hash(registerDto.password, 10)
+    // registerDto.password = hashedPassword
+
+
   }
 
-  findAll() {
-    return `This action returns all identity`;
+  async login(loginUserDto: LoginDto) {
+
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} identity`;
+  async verifyKyc(userId: string, verifyKycDto: VerifyKycDto) {
+
   }
 
-  update(id: number, updateIdentityDto: UpdateIdentityDto) {
-    return `This action updates a #${id} identity`;
+  async getCurrentUser(userId: string) {
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} identity`;
-  }
 }

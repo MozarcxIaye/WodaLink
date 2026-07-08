@@ -1,7 +1,7 @@
 import { IsString, IsUrl } from "class-validator";
 
 
-export class VerifyKycDto{
+export class VerifyKycDto {
 
     @IsString()
     documentType!: string
