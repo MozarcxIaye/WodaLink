@@ -10,7 +10,8 @@ import { ProcurementModule } from './procurement/procurement.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
+      envFilePath: '.env',
     }),
     
     MongooseModule.forRootAsync({

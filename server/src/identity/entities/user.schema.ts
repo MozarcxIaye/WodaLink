@@ -51,7 +51,8 @@ export class User {
     role!: UserRole
 
     @Prop({
-        required: true
+        required: true,
+        default: false
     })
     isVerified!: boolean
 

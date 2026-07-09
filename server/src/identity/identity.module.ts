@@ -5,19 +5,20 @@ import { IdentityController } from './identity.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './entities/user.schema';
 
 
 @Module({
   imports: [
     PassportModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        // secret: process.env.SECRET_KEY,
-          secret: configService.get<string>('SECRET_KEY'),
-          signOptions: { expiresIn: '15m' }
-
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '15m' }
       })
     })
   ],
