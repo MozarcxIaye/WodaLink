@@ -24,5 +24,7 @@ import { User, UserSchema } from './entities/user.schema';
   ],
   controllers: [IdentityController],
   providers: [IdentityService, JwtStrategy],
+  exports: [MongooseModule]
+  
 })
 export class IdentityModule { }

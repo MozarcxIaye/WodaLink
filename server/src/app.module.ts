@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IdentityModule } from './identity/identity.module';
 import { ProcurementModule } from './procurement/procurement.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
 
 
 @Module({
@@ -44,6 +45,8 @@ import { ProcurementModule } from './procurement/procurement.module';
     IdentityModule,
     
     ProcurementModule,
+    
+    MarketplaceModule,
     
     
   ],

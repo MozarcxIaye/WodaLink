@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { ProcurementService } from './procurement.service';
-import { CreateProcurementDto } from './dto/create-procurement.dto';
-import { UpdateProcurementDto } from './dto/update-procurement.dto';
+import { CreateRequestDto } from './dto/create-request.dto';
+import { AssignRunnerDto } from './dto/assign-runner.dto';
+import { UploadScanDto } from './dto/upload-scan.dto';
+import { JwtAuthGuard } from '../identity/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('procurement')
 export class ProcurementController {
   constructor(private readonly procurementService: ProcurementService) {}
 
-  @Post()
-  create(@Body() createProcurementDto: CreateProcurementDto) {
-    return this.procurementService.create(createProcurementDto);
+  @Post('request')
+  createRequest(@Req() req, @Body() dto: CreateRequestDto) {
+    return this.procurementService.create(req.user.userId, dto);
   }
 
-  @Get()
-  findAll() {
+  @Get('requests')
+  getAllRequests() {
     return this.procurementService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.procurementService.findOne(+id);
+  @Get('request/:id')
+  getSingleRequest(@Param('id') id: string) {
+    return this.procurementService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProcurementDto: UpdateProcurementDto) {
-    return this.procurementService.update(+id, updateProcurementDto);
+  @Patch('request/:id/assign')
+  assignRunner(@Param('id') id: string, @Body() dto: AssignRunnerDto) {
+    return this.procurementService.assignRunner(id, dto.runnerId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.procurementService.remove(+id);
+  @Patch('request/:id/upload')
+  uploadScan(@Req() req, @Param('id') id: string, @Body() dto: UploadScanDto) {
+    return this.procurementService.uploadScan(id, req.user.userId, dto);
+  }
+
+  @Delete('request/:id')
+  cancelRequest(@Req() req, @Param('id') id: string) {
+    return this.procurementService.cancel(id, req.user.userId);
   }
 }
