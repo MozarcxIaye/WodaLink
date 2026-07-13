@@ -3,6 +3,7 @@ import { ProcurementService } from './procurement.service';
 import { ProcurementController } from './procurement.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentRequest, DocumentRequestSchema } from './entities/document-request-schema';
+import { RequestStateService } from './request-state.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { DocumentRequest, DocumentRequestSchema } from './entities/document-requ
     ]),
   ],
   controllers: [ProcurementController],
-  providers: [ProcurementService],
-  exports: [MongooseModule]
+  providers: [ProcurementService, RequestStateService],
+  exports: [MongooseModule, RequestStateService]
 })
 export class ProcurementModule {}

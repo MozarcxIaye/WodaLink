@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../identity/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('procurement')
 export class ProcurementController {
-  constructor(private readonly procurementService: ProcurementService) {}
+  constructor(private readonly procurementService: ProcurementService) { }
 
   @Post('request')
   createRequest(@Req() req, @Body() dto: CreateRequestDto) {
@@ -38,5 +38,11 @@ export class ProcurementController {
   @Delete('request/:id')
   cancelRequest(@Req() req, @Param('id') id: string) {
     return this.procurementService.cancel(id, req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard) // Assuming you secure this endpoint context
+  @Patch('request/:id/start')
+  startProcessing(@Req() req, @Param('id') id: string) {
+    return this.procurementService.startProcessing(id, req.user.userId);
   }
 }
