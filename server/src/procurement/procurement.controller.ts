@@ -40,7 +40,12 @@ export class ProcurementController {
     return this.procurementService.cancel(id, req.user.userId);
   }
 
-  @UseGuards(JwtAuthGuard) // Assuming you secure this endpoint context
+  @Get('dashboard')
+  getDashboard(@Req() req) {
+    return this.procurementService.getUserDashboard(req.user.userId, req.user.role);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('request/:id/start')
   startProcessing(@Req() req, @Param('id') id: string) {
     return this.procurementService.startProcessing(id, req.user.userId);

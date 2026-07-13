@@ -92,4 +92,50 @@ export class ProcurementService {
     request.status = RequestStatus.CANCELLED;
     return request.save();
   }
+
+  // Add this method inside your ProcurementService class:
+async getUserDashboard(userId: string, role: string) {
+  // If the logged-in user is a Runner, show their active operations pipeline
+  if (role === 'runner') {
+    const activeJobs = await this.requestModel.find({
+      runnerId: userId,
+      status: { $in: [RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS] }
+    }).sort({ updatedAt: -1 }).exec();
+
+    const completedJobs = await this.requestModel.find({
+      runnerId: userId,
+      status: RequestStatus.COMPLETED
+    }).sort({ updatedAt: -1 }).limit(10).exec(); // Limit history count for performance
+
+    return {
+      summary: {
+        activeCount: activeJobs.length,
+        completedTotal: completedJobs.length,
+      },
+      activeJobs,
+      completedHistory: completedJobs
+    };
+  }
+
+  // Otherwise, the user is an Expat client. Show their document orders status tracker.
+  const openRequests = await this.requestModel.find({
+    expatId: userId,
+    status: { $in: [RequestStatus.PENDING, RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS] }
+  }).sort({ createdAt: -1 }).exec();
+
+  const historicRequests = await this.requestModel.find({
+    expatId: userId,
+    status: { $in: [RequestStatus.COMPLETED, RequestStatus.CANCELLED] }
+  }).sort({ updatedAt: -1 }).limit(10).exec();
+
+  return {
+    summary: {
+      pendingApprovalCount: openRequests.filter(r => r.status === RequestStatus.PENDING).length,
+      activeProcessingCount: openRequests.filter(r => r.status !== RequestStatus.PENDING).length,
+    },
+    openRequests,
+    history: historicRequests
+  };
+}
+
 }
