@@ -32,6 +32,9 @@ export class DocumentRequest {
 
   @Prop({ required: false })
   scanUrl?: string;
+
+  @Prop({ type: Boolean, default: false, index: true })
+  isPaid!: boolean;
 }
 
 export const DocumentRequestSchema = SchemaFactory.createForClass(DocumentRequest);

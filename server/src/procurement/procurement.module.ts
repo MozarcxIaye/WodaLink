@@ -4,6 +4,7 @@ import { ProcurementController } from './procurement.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentRequest, DocumentRequestSchema } from './entities/document-request-schema';
 import { RequestStateService } from './request-state.service';
+import { PaymentsService } from './payments.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { RequestStateService } from './request-state.service';
     ]),
   ],
   controllers: [ProcurementController],
-  providers: [ProcurementService, RequestStateService],
+  providers: [ProcurementService, RequestStateService, PaymentsService],
   exports: [MongooseModule, RequestStateService]
 })
 export class ProcurementModule {}
