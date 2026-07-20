@@ -24,13 +24,19 @@ export class MarketplaceController {
   @ApiOperation({ summary: 'List available jobs for the runner in a territory' })
   @ApiQuery({ name: 'wardCode', required: false, description: 'Optional ward code to filter jobs' })
   @ApiQuery({ name: 'municipalityId', required: false, description: 'Optional municipality ID to filter jobs' })
+  @ApiQuery({ name: 'showAll', required: false, description: 'Return all open jobs instead of only the runner territory' })
   @ApiResponse({ status: 200, description: 'Returns open jobs for the runner' })
   getOpenJobs(
-    @Req() req, 
+    @Req() req,
     @Query('wardCode') wardCode?: string,
-    @Query('municipalityId') municipalityId?: string
+    @Query('municipalityId') municipalityId?: string,
+    @Query('showAll') showAll?: string,
   ) {
-    return this.marketplaceService.findOpenRequestsForTerritory(req.user.userId, { wardCode, municipalityId });
+    return this.marketplaceService.findOpenRequestsForTerritory(req.user.userId, {
+      wardCode,
+      municipalityId,
+      showAll: showAll === 'true' || showAll === '1',
+    });
   }
 
   // Runner self-claims an available job

@@ -6,6 +6,37 @@ import { RequestStatus } from '../procurement/entities/request-status.enum';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
 import { RequestStateService } from '../procurement/request-state.service'; // 💡 Imported the state machine service
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildMunicipalityRegex(value?: string) {
+  if (!value) return undefined;
+
+  const normalized = value.trim();
+  if (!normalized) return undefined;
+
+  const aliases = new Set<string>([normalized]);
+  const lookup = normalized.toLowerCase();
+
+  const aliasMap: Record<string, string[]> = {
+    ktm: ['KTM', 'Kathmandu'],
+    lal: ['LAL', 'Lalitpur'],
+    pkh: ['PKH', 'Pokhara'],
+    bht: ['BHT', 'Bharatpur'],
+    bgn: ['BGN', 'Bhaktapur'],
+    kir: ['KIR', 'Kirtipur'],
+  };
+
+  const expanded = aliasMap[lookup];
+  if (expanded) {
+    expanded.forEach((alias) => aliases.add(alias));
+  }
+
+  const values = Array.from(aliases).filter(Boolean);
+  return values.length > 0 ? new RegExp(`^(${values.map(escapeRegExp).join('|')})`, 'i') : undefined;
+}
+
 @Injectable()
 export class MarketplaceService {
   constructor(
@@ -33,7 +64,7 @@ export class MarketplaceService {
   // 2. Discover open requests within the runner's registered municipality territory
   async findOpenRequestsForTerritory(
     runnerId: string, 
-    query: { wardCode?: string; municipalityId?: string }
+    query: { wardCode?: string; municipalityId?: string; showAll?: boolean }
   ) {
     const runner = await this.userModel.findById(runnerId);
     if (!runner || runner.role !== 'runner') {
@@ -42,16 +73,14 @@ export class MarketplaceService {
 
     const filterCriteria: any = { status: RequestStatus.PENDING };
 
-    if (query.wardCode) {
+    if (!query.showAll && query.wardCode) {
       filterCriteria.wardCode = query.wardCode;
     } 
-    else if (query.municipalityId) {
-      filterCriteria.wardCode = new RegExp(`^${query.municipalityId}`, 'i');
-    } 
-    else {
-      const defaultMuni = runner.runnerMetadata?.municipalityId;
-      if (defaultMuni) {
-        filterCriteria.wardCode = new RegExp(`^${defaultMuni}`, 'i');
+    else if (!query.showAll) {
+      const municipality = query.municipalityId || runner.runnerMetadata?.municipalityId;
+      const municipalityRegex = buildMunicipalityRegex(municipality);
+      if (municipalityRegex) {
+        filterCriteria.wardCode = municipalityRegex;
       }
     }
 

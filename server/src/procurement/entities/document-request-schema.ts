@@ -35,6 +35,24 @@ export class DocumentRequest {
 
   @Prop({ type: Boolean, default: false, index: true })
   isPaid!: boolean;
+
+  @Prop({ type: Boolean, default: false, index: true })
+  isEscalated!: boolean;
+
+  @Prop({ type: String, enum: ['low', 'medium', 'high'], required: false })
+  escalationLevel?: 'low' | 'medium' | 'high';
+
+  @Prop({ type: String, required: false })
+  escalationReason?: string;
+
+  @Prop({ type: String, required: false })
+  adminNote?: string;
+
+  @Prop({ type: Date, required: false })
+  escalatedAt?: Date;
+
+  @Prop({ type: Date, required: false })
+  resolvedAt?: Date;
 }
 
 export const DocumentRequestSchema = SchemaFactory.createForClass(DocumentRequest);

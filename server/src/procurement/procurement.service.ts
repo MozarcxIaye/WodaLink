@@ -6,7 +6,8 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { RequestStatus } from './entities/request-status.enum';
 import { UploadScanDto } from './dto/upload-scan.dto';
 import { DocumentRequest, DocumentRequestDocument } from './entities/document-request-schema';
-import { RequestStateService } from './request-state.service'; // 💡 Import the state machine
+import { RequestStateService } from './request-state.service';
+import { evaluateEscalation } from './escalation.utils';
 
 @Injectable()
 export class ProcurementService {
@@ -26,6 +27,46 @@ export class ProcurementService {
 
   async findAll() {
     return this.requestModel.find().exec();
+  }
+
+  async getEscalations() {
+    const requests = await this.requestModel.find().sort({ updatedAt: -1 }).exec();
+
+    return requests.map((request) => {
+      const evaluation = evaluateEscalation(request);
+      const shouldEscalate = request.isEscalated || evaluation.isEscalated;
+      return {
+        ...request.toObject(),
+        isEscalated: shouldEscalate,
+        escalationReason: request.escalationReason || evaluation.escalationReason || undefined,
+        escalationLevel: request.escalationLevel || evaluation.escalationLevel || 'medium',
+        escalatedAt: request.escalatedAt ? request.escalatedAt.toISOString() : undefined,
+      };
+    }).filter((request) => request.isEscalated);
+  }
+
+  async escalateRequest(id: string, adminNote?: string) {
+    const request = await this.findOne(id);
+    const evaluation = evaluateEscalation(request);
+
+    request.isEscalated = true;
+    request.escalationReason = request.escalationReason || evaluation.escalationReason || 'MANUAL';
+    request.escalationLevel = request.escalationLevel || evaluation.escalationLevel || 'high';
+    request.adminNote = adminNote || request.adminNote;
+    request.escalatedAt = request.escalatedAt || new Date();
+    request.resolvedAt = undefined;
+    return request.save();
+  }
+
+  async resolveEscalation(id: string, adminNote?: string) {
+    const request = await this.findOne(id);
+    request.isEscalated = false;
+    request.escalationReason = undefined;
+    request.escalationLevel = undefined;
+    request.adminNote = adminNote || request.adminNote;
+    request.escalatedAt = undefined;
+    request.resolvedAt = new Date();
+    return request.save();
   }
 
   async findOne(id: string) {
@@ -67,7 +108,7 @@ export class ProcurementService {
   async uploadScan(requestId: string, runnerId: string, dto: UploadScanDto) {
     const request = await this.findOne(requestId);
 
-    if (request.runnerId !== runnerId) {
+    if (String(request.runnerId) !== String(runnerId)) {
       throw new ForbiddenException('You are not the assigned runner for this request');
     }
 
@@ -76,6 +117,7 @@ export class ProcurementService {
 
     request.scanUrl = dto.scanUrl;
     request.status = RequestStatus.COMPLETED;
+    request.isPaid = true;
     return request.save();
   }
 
