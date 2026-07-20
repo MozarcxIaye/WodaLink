@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
+import { usdToNpr, nprToPaisa } from '../common/currency';
 
 @Injectable()
 export class PaymentsService {
@@ -7,13 +8,14 @@ export class PaymentsService {
   private readonly KHALTI_SECRET_KEY = 'key 1b1cbe6e986e43d69f42fbbb8c725780';
   private readonly KHALTI_INITIATE_URL = 'https://dev.khalti.com/api/v2/epayment/initiate/';
 
-  async initiateKhaltiPayment(requestId: string, amountInNpr: number) {
+  async initiateKhaltiPayment(requestId: string, amountInUsd: number) {
     try {
       const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
       const returnUrl = process.env.KHALTI_RETURN_URL || `${frontendUrl}/procurement/payment/callback`;
       const websiteUrl = process.env.KHALTI_WEBSITE_URL || frontendUrl;
       const purchaseOrderId = String(requestId);
-      const amountPaisa = Math.round(amountInNpr * 100);
+      const amountInNpr = usdToNpr(amountInUsd);
+      const amountPaisa = nprToPaisa(amountInNpr);
 
       if (!Number.isFinite(amountPaisa) || amountPaisa <= 0) {
         throw new BadRequestException('Invalid escrow amount for Khalti payment initiation.');

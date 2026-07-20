@@ -6,6 +6,7 @@ import type { DocumentRequest } from '../../../types';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { Loader2, MapPin, DollarSign, FileText, HandMetal } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 export function OpenJobs() {
   const { user } = useAuth();
@@ -57,7 +58,12 @@ export function OpenJobs() {
       accessor: (req: DocumentRequest) => (
         <div className="flex items-center gap-1.5">
           <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
-          <span className="font-semibold">${req.escrowAmount}</span>
+          <span className="font-semibold">
+            {formatNpr(usdToNpr(req.escrowAmount))}
+            <span className="text-neutral-400 font-normal ml-1">
+              ({formatUsd(req.escrowAmount)})
+            </span>
+          </span>
         </div>
       ),
     },
@@ -164,8 +170,13 @@ export function OpenJobs() {
                 <span className="font-semibold text-neutral-800 dark:text-neutral-200">{req.wardCode}</span>
               </div>
               <div>
-                <span className="block text-neutral-500 font-medium">Escrow</span>
-                <span className="font-semibold text-emerald-600">${req.escrowAmount}</span>
+                <span className="block text-neutral-500 font-medium">Payout</span>
+                <span className="font-semibold text-emerald-600">
+                  {formatNpr(usdToNpr(req.escrowAmount))}
+                  <span className="text-neutral-400 font-normal block">
+                    ({formatUsd(req.escrowAmount)})
+                  </span>
+                </span>
               </div>
             </div>
             <button

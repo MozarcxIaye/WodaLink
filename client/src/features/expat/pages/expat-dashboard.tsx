@@ -3,6 +3,7 @@ import type { ExpatDashboardData } from '../../../types';
 import { Link } from 'react-router';
 import { StatusBadge } from '../../../components/status-badge';
 import { Loader2, Plus, ArrowRight, FileText, CheckCircle2, History, AlertCircle } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 export function ExpatDashboard() {
   const { data, isLoading, error } = useProcurementDashboard();
@@ -114,7 +115,7 @@ export function ExpatDashboard() {
                     )}
                   </div>
                   <p className="text-xs text-neutral-500">
-                    Ward Code: <span className="font-semibold text-neutral-700 dark:text-neutral-300">{req.wardCode}</span> • Escrow: <span className="font-semibold text-neutral-700 dark:text-neutral-300">${req.escrowAmount}</span>
+                    Ward Code: <span className="font-semibold text-neutral-700 dark:text-neutral-300">{req.wardCode}</span> • Escrow: <span className="font-semibold text-neutral-700 dark:text-neutral-300">{formatUsd(req.escrowAmount)} ({formatNpr(usdToNpr(req.escrowAmount))})</span>
                   </p>
                 </div>
                 <Link
@@ -160,7 +161,7 @@ export function ExpatDashboard() {
                   <div className="flex items-center gap-2">
                     <StatusBadge status={req.status} />
                     <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
-                      ${req.escrowAmount}
+                      {formatUsd(req.escrowAmount)}
                     </span>
                   </div>
                 </div>

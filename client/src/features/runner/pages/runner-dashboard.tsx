@@ -16,6 +16,7 @@ import {
   Building2,
   ToggleRight,
 } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 const NEPAL_MUNICIPALITIES = [
   { id: 'KTM', name: 'Kathmandu Metropolitan City' },
@@ -191,7 +192,7 @@ export function RunnerDashboard() {
                   </div>
                   <p className="text-xs text-neutral-500">
                     Ward: <span className="font-semibold text-neutral-700 dark:text-neutral-300">{job.wardCode}</span>
-                    {' '} • Escrow: <span className="font-semibold text-neutral-700 dark:text-neutral-300">${job.escrowAmount}</span>
+                    {' '} • Payout: <span className="font-semibold text-neutral-700 dark:text-neutral-300">{formatNpr(usdToNpr(job.escrowAmount))} ({formatUsd(job.escrowAmount)})</span>
                   </p>
                 </div>
                 <Link
@@ -224,7 +225,7 @@ export function RunnerDashboard() {
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={job.status} />
-                    <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">${job.escrowAmount}</span>
+                    <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">{formatNpr(usdToNpr(job.escrowAmount))}</span>
                   </div>
                 </div>
               ))}

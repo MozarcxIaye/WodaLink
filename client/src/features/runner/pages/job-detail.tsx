@@ -18,6 +18,7 @@ import {
   XCircle,
   Link as LinkIcon,
 } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 export function JobDetail() {
   const { id = '' } = useParams<{ id: string }>();
@@ -140,7 +141,12 @@ export function JobDetail() {
               <DollarSign className="h-5 w-5 text-neutral-400 shrink-0" />
               <div>
                 <span className="block text-xs font-medium text-neutral-400 uppercase tracking-wider">Escrow Payout</span>
-                <span className="font-semibold text-emerald-600">${request.escrowAmount}</span>
+                <span className="font-semibold text-emerald-600">
+                  {formatNpr(usdToNpr(request.escrowAmount))}
+                  <span className="text-neutral-400 font-normal ml-1">
+                    ({formatUsd(request.escrowAmount)})
+                  </span>
+                </span>
               </div>
             </div>
 

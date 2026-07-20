@@ -1,10 +1,11 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useCreateRequest } from '../../procurement/hooks/use-procurement';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { Loader2, FileText, Landmark, DollarSign, Link as LinkIcon } from 'lucide-react';
+import { usdToNpr, formatNpr, formatUsd } from '../../../utils/currency';
 
 const createRequestSchema = z.object({
   documentType: z.enum(['BIRTH_CERTIFICATE', 'MARRIAGE_CERTIFICATE', 'POLICE_CLEARANCE', 'OTHER'] as const),
@@ -21,6 +22,17 @@ const DOCUMENT_TYPES = [
   { value: 'POLICE_CLEARANCE', label: 'Police Clearance Record' },
   { value: 'OTHER', label: 'Other Government / Legal Document' },
 ];
+
+function ConversionPreview({ name }: { name: string }) {
+  const amount = useWatch<CreateRequestInput>({ name: name as any });
+  const numericAmount = Number(amount) || 0;
+  if (!numericAmount || numericAmount <= 0) return null;
+  return (
+    <p className="mt-1 text-xxs text-emerald-600 dark:text-emerald-400 font-medium">
+      ≈ {formatNpr(usdToNpr(numericAmount))} at current exchange rate
+    </p>
+  );
+}
 
 export function CreateRequest() {
   const navigate = useNavigate();
@@ -134,6 +146,7 @@ export function CreateRequest() {
               }`}
             />
           </div>
+          <ConversionPreview name="escrowAmount" />
           <p className="mt-1 text-xxs text-neutral-400">
             This amount will be locked in WodaLink escrow and released to the runner upon successful procurement.
           </p>

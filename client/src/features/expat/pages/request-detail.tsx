@@ -18,6 +18,7 @@ import {
   User as UserIcon,
   CheckCircle,
 } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 export function RequestDetail() {
   const { id = '' } = useParams<{ id: string }>();
@@ -149,7 +150,12 @@ export function RequestDetail() {
               <DollarSign className="h-5 w-5 text-neutral-400 shrink-0" />
               <div>
                 <span className="block text-xs font-medium text-neutral-400 uppercase tracking-wider">Escrow Amount</span>
-                <span className="font-semibold text-neutral-900 dark:text-white">${request.escrowAmount}</span>
+                <span className="font-semibold text-neutral-900 dark:text-white">
+                  {formatUsd(request.escrowAmount)}
+                  <span className="text-neutral-400 font-normal text-xxs ml-1">
+                    ({formatNpr(usdToNpr(request.escrowAmount))})
+                  </span>
+                </span>
               </div>
             </div>
 
@@ -212,7 +218,7 @@ export function RequestDetail() {
                 ) : (
                   <>
                     <CreditCard className="h-4 w-4" />
-                    Pay Escrow (${request.escrowAmount})
+                    Pay Escrow ({formatNpr(usdToNpr(request.escrowAmount))})
                   </>
                 )}
               </button>

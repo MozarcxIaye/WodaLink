@@ -5,6 +5,7 @@ import { DataTable } from '../../../components/data-table';
 import { StatusBadge } from '../../../components/status-badge';
 import type { DocumentRequest } from '../../../types';
 import { Plus, Loader2 } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 export function RequestsList() {
   const { user } = useAuth();
@@ -30,7 +31,14 @@ export function RequestsList() {
     },
     {
       header: 'Escrow Amount',
-      accessor: (req: DocumentRequest) => <span className="font-semibold">${req.escrowAmount}</span>,
+      accessor: (req: DocumentRequest) => (
+        <span className="font-semibold">
+          {formatUsd(req.escrowAmount)}
+          <span className="text-neutral-400 font-normal ml-1">
+            ({formatNpr(usdToNpr(req.escrowAmount))})
+          </span>
+        </span>
+      ),
     },
     {
       header: 'Payment Status',
@@ -114,7 +122,12 @@ export function RequestsList() {
               </div>
               <div>
                 <span className="block font-medium">Escrow</span>
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">${req.escrowAmount}</span>
+                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                  {formatUsd(req.escrowAmount)}
+                  <span className="text-neutral-400 font-normal block">
+                    {formatNpr(usdToNpr(req.escrowAmount))}
+                  </span>
+                </span>
               </div>
               <div>
                 <span className="block font-medium">Payment</span>

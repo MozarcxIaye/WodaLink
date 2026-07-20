@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from 'lucide-react';
+import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
 
 const STATUS_CONFIG: Array<{ key: DocumentRequest['status']; label: string; description: string }> = [
   { key: 'PENDING', label: 'Pending', description: 'Awaiting payment or runner claim' },
@@ -112,8 +113,8 @@ export function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-amber-500" />
             <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Escrow Value</span>
           </div>
-          <span className="text-2xl font-extrabold text-neutral-900 dark:text-white">${totalEscrow.toLocaleString()}</span>
-          <p className="mt-2 text-xs text-neutral-500">Total funds currently tied to requests.</p>
+          <span className="text-2xl font-extrabold text-neutral-900 dark:text-white">{formatUsd(totalEscrow)}</span>
+          <p className="mt-2 text-xs text-neutral-500">Total funds ({formatNpr(usdToNpr(totalEscrow))}).</p>
         </div>
 
         <div className="rounded-2xl border border-neutral-200/60 bg-white p-5 shadow-xs dark:border-neutral-800/80 dark:bg-[#13141b]">
@@ -302,7 +303,7 @@ export function AdminDashboard() {
                       <span className="text-xs text-neutral-500">{req.wardCode}</span>
                     </div>
                     <p className="mt-1 text-xs text-neutral-500">
-                      Updated {new Date(req.updatedAt).toLocaleDateString()} • Escrow ${req.escrowAmount}
+                      Updated {new Date(req.updatedAt).toLocaleDateString()} • Escrow {formatUsd(req.escrowAmount)}
                     </p>
                   </div>
                   <StatusBadge status={req.status} />
