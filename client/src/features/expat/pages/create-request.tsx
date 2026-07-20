@@ -1,4 +1,4 @@
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, type Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useCreateRequest } from '../../procurement/hooks/use-procurement';
@@ -23,12 +23,24 @@ const DOCUMENT_TYPES = [
   { value: 'OTHER', label: 'Other Government / Legal Document' },
 ];
 
-function ConversionPreview({ name }: { name: string }) {
-  const amount = useWatch<CreateRequestInput>({ name: name as any });
+function ConversionPreview({
+  control,
+}: {
+  control: Control<CreateRequestInput>;
+}) {
+  const amount = useWatch({
+    control,
+    name: 'escrowAmount',
+  });
+
   const numericAmount = Number(amount) || 0;
-  if (!numericAmount || numericAmount <= 0) return null;
+
+  if (numericAmount <= 0) {
+    return null;
+  }
+
   return (
-    <p className="mt-1 text-xxs text-emerald-600 dark:text-emerald-400 font-medium">
+    <p className="mt-1 text-xxs font-medium text-emerald-600 dark:text-emerald-400">
       ≈ {formatNpr(usdToNpr(numericAmount))} at current exchange rate
     </p>
   );
@@ -41,6 +53,7 @@ export function CreateRequest() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<CreateRequestInput>({
     resolver: zodResolver(createRequestSchema),
@@ -85,11 +98,10 @@ export function CreateRequest() {
             <FileText className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
             <select
               {...register('documentType')}
-              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors appearance-none ${
-                errors.documentType
+              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors appearance-none ${errors.documentType
                   ? 'border-red-500 focus:ring-1 focus:ring-red-500'
                   : 'border-neutral-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-neutral-800'
-              }`}
+                }`}
             >
               <option value="">Select Document Type</option>
               {DOCUMENT_TYPES.map((type) => (
@@ -115,11 +127,10 @@ export function CreateRequest() {
               type="text"
               placeholder="e.g. KTM-Ward-12"
               {...register('wardCode')}
-              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${
-                errors.wardCode
+              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${errors.wardCode
                   ? 'border-red-500 focus:ring-1 focus:ring-red-500'
                   : 'border-neutral-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-neutral-800'
-              }`}
+                }`}
             />
           </div>
           <p className="mt-1 text-xxs text-neutral-400">
@@ -139,14 +150,13 @@ export function CreateRequest() {
               type="number"
               placeholder="50"
               {...register('escrowAmount', { valueAsNumber: true })}
-              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${
-                errors.escrowAmount
+              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${errors.escrowAmount
                   ? 'border-red-500 focus:ring-1 focus:ring-red-500'
                   : 'border-neutral-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-neutral-800'
-              }`}
+                }`}
             />
           </div>
-          <ConversionPreview name="escrowAmount" />
+          <ConversionPreview control={control} />
           <p className="mt-1 text-xxs text-neutral-400">
             This amount will be locked in WodaLink escrow and released to the runner upon successful procurement.
           </p>
@@ -164,11 +174,10 @@ export function CreateRequest() {
               type="text"
               placeholder="https://example.com/my-identity.pdf"
               {...register('poaUrl')}
-              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${
-                errors.poaUrl
+              className={`w-full rounded-lg border bg-white dark:bg-neutral-900 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors ${errors.poaUrl
                   ? 'border-red-500 focus:ring-1 focus:ring-red-500'
                   : 'border-neutral-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-neutral-800'
-              }`}
+                }`}
             />
           </div>
           <p className="mt-1 text-xxs text-neutral-400">
