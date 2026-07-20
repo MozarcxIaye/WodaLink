@@ -5,7 +5,7 @@ import { useCreateRequest } from '../../procurement/hooks/use-procurement';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { Loader2, FileText, Landmark, DollarSign, Link as LinkIcon } from 'lucide-react';
-import { usdToNpr, formatNpr, formatUsd } from '../../../utils/currency';
+import { usdToNpr, formatNpr } from '../../../utils/currency';
 
 const createRequestSchema = z.object({
   documentType: z.enum(['BIRTH_CERTIFICATE', 'MARRIAGE_CERTIFICATE', 'POLICE_CLEARANCE', 'OTHER'] as const),
