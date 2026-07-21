@@ -105,6 +105,19 @@ export class ProcurementService {
     return request.save();
   }
 
+  async markDocumentReady(requestId: string, runnerId: string) {
+    const request = await this.findOne(requestId);
+
+    if (String(request.runnerId) !== String(runnerId)) {
+      throw new ForbiddenException('You are not the assigned runner for this request');
+    }
+
+    this.stateMachine.validateTransition(request.status, RequestStatus.DOCUMENT_READY);
+
+    request.status = RequestStatus.DOCUMENT_READY;
+    return request.save();
+  }
+
   async uploadScan(requestId: string, runnerId: string, dto: UploadScanDto) {
     const request = await this.findOne(requestId);
 
@@ -112,12 +125,14 @@ export class ProcurementService {
       throw new ForbiddenException('You are not the assigned runner for this request');
     }
 
-    // 💡 Day 8 Validation: Ensure transition to COMPLETED is legal
+    if (!request.isPaid) {
+      throw new BadRequestException('Cannot upload scan until the expat has paid the escrow.');
+    }
+
     this.stateMachine.validateTransition(request.status, RequestStatus.COMPLETED);
 
     request.scanUrl = dto.scanUrl;
     request.status = RequestStatus.COMPLETED;
-    request.isPaid = true;
     return request.save();
   }
 
@@ -141,7 +156,7 @@ async getUserDashboard(userId: string, role: string) {
   if (role === 'runner') {
     const activeJobs = await this.requestModel.find({
       runnerId: userId,
-      status: { $in: [RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS] }
+      status: { $in: [RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS, RequestStatus.DOCUMENT_READY] }
     }).sort({ updatedAt: -1 }).exec();
 
     const completedJobs = await this.requestModel.find({
@@ -162,7 +177,7 @@ async getUserDashboard(userId: string, role: string) {
   // Otherwise, the user is an Expat client. Show their document orders status tracker.
   const openRequests = await this.requestModel.find({
     expatId: userId,
-    status: { $in: [RequestStatus.PENDING, RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS] }
+    status: { $in: [RequestStatus.PENDING, RequestStatus.ASSIGNED, RequestStatus.IN_PROGRESS, RequestStatus.DOCUMENT_READY] }
   }).sort({ createdAt: -1 }).exec();
 
   const historicRequests = await this.requestModel.find({

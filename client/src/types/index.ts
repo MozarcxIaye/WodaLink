@@ -1,6 +1,6 @@
 export type UserRole = 'expat' | 'runner' | 'admin';
 
-export type RequestStatus = 'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type RequestStatus = 'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'DOCUMENT_READY' | 'COMPLETED' | 'CANCELLED';
 
 export type DocumentType = 'BIRTH_CERTIFICATE' | 'MARRIAGE_CERTIFICATE' | 'POLICE_CLEARANCE' | 'OTHER';
 

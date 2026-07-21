@@ -12,6 +12,7 @@ export function Timeline({ status }: TimelineProps) {
     { key: 'PENDING', label: 'Request Placed' },
     { key: 'ASSIGNED', label: 'Runner Assigned' },
     { key: 'IN_PROGRESS', label: 'In Procurement' },
+    { key: 'DOCUMENT_READY', label: 'Document Ready' },
     { key: 'COMPLETED', label: 'Completed' },
   ];
 
@@ -22,7 +23,6 @@ export function Timeline({ status }: TimelineProps) {
 
   const steps = isCancelled ? cancelledSteps : normalSteps;
 
-  // Find index of current status
   const currentStepIndex = steps.findIndex((step) => step.key === status);
 
   return (

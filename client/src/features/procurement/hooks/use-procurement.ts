@@ -60,6 +60,18 @@ export function useStartProcessing() {
   });
 }
 
+export function useMarkDocumentReady() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => procurementService.markDocumentReady(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['procurement', 'requests'] });
+      queryClient.invalidateQueries({ queryKey: ['procurement', 'dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['procurement', 'request', data._id] });
+    },
+  });
+}
+
 export function useUploadScan() {
   const queryClient = useQueryClient();
   return useMutation({

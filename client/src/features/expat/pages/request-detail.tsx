@@ -200,11 +200,22 @@ export function RequestDetail() {
                 )}
               </div>
             )}
+
+            {request.status === 'DOCUMENT_READY' && !request.isPaid && (
+              <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200/40 dark:border-cyan-500/20 text-center">
+                <p className="text-xs font-semibold text-cyan-700 dark:text-cyan-400">
+                  ✓ Document Ready
+                </p>
+                <p className="text-xxs text-cyan-600 dark:text-cyan-500 mt-1">
+                  The runner has completed the document. Pay the escrow now to receive the final scan.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
             {/* Pay Escrow Button */}
-            {!request.isPaid && request.status === 'PENDING' && (
+            {!request.isPaid && (request.status === 'PENDING' || request.status === 'DOCUMENT_READY') && (
               <button
                 onClick={handlePayment}
                 disabled={payMutation.isPending}
@@ -214,6 +225,11 @@ export function RequestDetail() {
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Connecting...
+                  </>
+                ) : request.status === 'DOCUMENT_READY' ? (
+                  <>
+                    <CreditCard className="h-4 w-4" />
+                    Pay Now – Document Ready ({formatNpr(usdToNpr(request.escrowAmount))})
                   </>
                 ) : (
                   <>

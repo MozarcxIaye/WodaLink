@@ -49,6 +49,11 @@ export const procurementService = {
     return response.data;
   },
 
+  markDocumentReady: async (id: string) => {
+    const response = await apiClient.patch<DocumentRequest>(`/procurement/request/${id}/mark-ready`);
+    return response.data;
+  },
+
   pay: async (id: string) => {
     const response = await apiClient.post<{ paymentUrl: string }>(`/procurement/request/${id}/pay`);
     return response.data;

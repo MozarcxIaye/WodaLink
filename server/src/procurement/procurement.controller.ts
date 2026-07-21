@@ -113,6 +113,15 @@ export class ProcurementController {
     return this.procurementService.startProcessing(id, req.user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('request/:id/mark-ready')
+  @ApiOperation({ summary: 'Runner marks the document as ready for payment and final upload' })
+  @ApiParam({ name: 'id', description: 'ID of the procurement request', type: String })
+  @ApiResponse({ status: 200, description: 'Document marked as ready' })
+  markDocumentReady(@Req() req, @Param('id') id: string) {
+    return this.procurementService.markDocumentReady(id, req.user.userId);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('request/:id/pay')

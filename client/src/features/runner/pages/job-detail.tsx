@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router';
-import { useRequest, useStartProcessing, useUploadScan } from '../../procurement/hooks/use-procurement';
+import { useRequest, useStartProcessing, useUploadScan, useMarkDocumentReady } from '../../procurement/hooks/use-procurement';
 import { useRejectJob } from '../../marketplace/hooks/use-marketplace';
 import { Timeline } from '../../../components/timeline';
 import { StatusBadge } from '../../../components/status-badge';
@@ -16,6 +16,7 @@ import {
   Play,
   Upload,
   XCircle,
+  CheckCircle2,
   Link as LinkIcon,
 } from 'lucide-react';
 import { formatUsd, formatNpr, usdToNpr } from '../../../utils/currency';
@@ -28,6 +29,7 @@ export function JobDetail() {
   const startMutation = useStartProcessing();
   const uploadMutation = useUploadScan();
   const rejectMutation = useRejectJob();
+  const markReadyMutation = useMarkDocumentReady();
   const [scanUrl, setScanUrl] = useState('');
 
   const handleStart = async () => {
@@ -52,6 +54,19 @@ export function JobDetail() {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Failed to upload scan.');
+    }
+  };
+
+  const handleMarkReady = async () => {
+    if (!window.confirm('Mark the document as ready? The expat will be notified to proceed with payment before you can upload the final scan.')) {
+      return;
+    }
+    try {
+      await markReadyMutation.mutateAsync(id);
+      toast.success('Document marked as ready! Waiting for expat payment to complete.');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error.response?.data?.message || 'Failed to mark document as ready.');
     }
   };
 
@@ -188,11 +203,27 @@ export function JobDetail() {
               </button>
             )}
 
-            {/* Upload Scan Section */}
+            {/* Mark Document as Ready Button */}
             {request.status === 'IN_PROGRESS' && (
+              <button
+                onClick={handleMarkReady}
+                disabled={markReadyMutation.isPending}
+                className="w-full flex items-center justify-center gap-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 py-2.5 px-4 text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50"
+              >
+                {markReadyMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4" />
+                )}
+                Mark Document as Ready
+              </button>
+            )}
+
+            {/* Upload Scan (only after payment) */}
+            {request.status === 'DOCUMENT_READY' && request.isPaid && (
               <div className="space-y-3">
                 <p className="text-xs text-neutral-500">
-                  Upload a scan or photo of the completed official document to complete this job.
+                  Payment confirmed! Upload the final scan to complete this job.
                 </p>
                 <div className="relative">
                   <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
@@ -216,6 +247,18 @@ export function JobDetail() {
                   )}
                   Upload Scan & Complete
                 </button>
+              </div>
+            )}
+
+            {/* Awaiting Payment Message */}
+            {request.status === 'DOCUMENT_READY' && !request.isPaid && (
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200/40 dark:border-amber-500/20 text-center">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                  ⏳ Awaiting Payment
+                </p>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                  The expat has been notified. Once they pay the escrow, you can upload the final scan.
+                </p>
               </div>
             )}
 

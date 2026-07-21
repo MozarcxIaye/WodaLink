@@ -9,10 +9,12 @@ export class RequestStateService {
   
     [RequestStatus.ASSIGNED]: [RequestStatus.IN_PROGRESS, RequestStatus.PENDING],
     
-    [RequestStatus.IN_PROGRESS]: [RequestStatus.COMPLETED, RequestStatus.PENDING],
+    [RequestStatus.IN_PROGRESS]: [RequestStatus.DOCUMENT_READY, RequestStatus.PENDING],
     
-    [RequestStatus.COMPLETED]: [], // Dead-end terminal state
-    [RequestStatus.CANCELLED]: [], // Dead-end terminal state
+    [RequestStatus.DOCUMENT_READY]: [RequestStatus.COMPLETED, RequestStatus.PENDING],
+    
+    [RequestStatus.COMPLETED]: [],
+    [RequestStatus.CANCELLED]: [],
   };
 
 
